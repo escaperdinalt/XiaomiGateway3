@@ -510,6 +510,7 @@ def test_18628():
     assert p.pop("timestamp")
     assert p == {"action": "error", "error": "Door Was Ajar", "error_id": 24}
 
-    p = device.decode({"eid": 22022, "edata": "29fbb46a"})
+    # doorbell button pressed
+    p = device.decode({"eid": 22022, "edata": "4a35b56a"})
     assert p.pop("timestamp")
     assert p == {"action": "doorbell"}
