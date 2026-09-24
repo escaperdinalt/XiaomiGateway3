@@ -2478,9 +2478,9 @@ DEVICES += [{
         BaseConv("battery", "sensor", mi="4.p.1003"),
         ConstConv("action", mi="5.e.1006", value="doorbell"),
         # mibeacon spec (gateway fw 1.5.0 sends raw eid instead of miot spec)
-        BLESpecLock("action", mi=18964),
-        BLESpecLockError("action", mi=18951),
-        BLESpecDoorbell("action", mi=22022),
+        BLELockAction("action", mi=18964),
+        BLELockError("action", mi=18951),
+        BLELockDoorbell("action", mi=22022),
         BLEMapConv("door", mi=19477, map={"10": "locked", "20": "unlocked", "40": "ajar"}),
         BLEByteConv("battery", mi=20483),
     ],
