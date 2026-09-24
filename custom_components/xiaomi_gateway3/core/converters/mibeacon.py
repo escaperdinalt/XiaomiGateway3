@@ -368,3 +368,84 @@ class BLEScaleS800(BaseConv):
 
                 if 40 <= heart_rate <= 220:
                     payload["heart_rate"] = heart_rate
+
+
+# --- loock.lock.h01lyk (pdid 18628) on gateway fw 1.5.0 ---
+# Gateway with "spec_supported": 0 sends lock data as raw mibeacon events with
+# numeric eid instead of miot spec:
+#   eid = 0x4000 | (0x200 if event) | (siid << 10) | (iid - 1000)
+# Event edata = event arguments packed in spec order, each by its own format.
+# Note: real operation-method numbering differs from the published miot spec
+# (2 is fingerprint and 3 is password, verified on device).
+
+SPEC_LOCK_POSITION = {1: "indoor", 2: "outdoor", 3: "unknown"}
+SPEC_LOCK_METHOD = {
+    1: "mobile", 2: "fingerprint", 3: "password", 4: "nfc", 8: "key",
+    9: "one_time_password", 10: "periodic_password", 12: "coerce",
+    14: "turntable", 15: "manual", 16: "auto", 20: "member",
+}
+SPEC_LOCK_ACTION = {
+    1: "lock", 2: "unlock", 3: "lock_outside", 8: "enable_away",
+    9: "disable_away", 10: "add_object", 11: "delete_object",
+    12: "add_object", 13: "delete_object", 14: "cannel_share",
+}
+
+
+class BLESpecLock(BaseConv):
+    """Lock Event (2.e.1020), args 1..5: position uint8, method uint8,
+    action uint8, key_id uint16, timestamp uint32."""
+
+    def decode(self, device: "XDevice", payload: dict, data: str):
+        data = bytes.fromhex(data)
+        if len(data) != 9 or data[2] not in SPEC_LOCK_ACTION:
+            return
+        payload.update(
+            {
+                "action": SPEC_LOCK_ACTION[data[2]],
+                "action_id": data[2],
+                "position": SPEC_LOCK_POSITION.get(data[0], data[0]),
+                "method": SPEC_LOCK_METHOD.get(data[1], data[1]),
+                "method_id": data[1],
+                "key_id": int.from_bytes(data[3:5], "little"),
+                "timestamp": datetime.fromtimestamp(
+                    int.from_bytes(data[5:9], "little")
+                ).isoformat(),
+            }
+        )
+
+
+class BLESpecLockError(BaseConv):
+    """Exception Occurred (2.e.1007), args 5 and 6: timestamp uint32,
+    abnormal condition uint8."""
+
+    def decode(self, device: "XDevice", payload: dict, data: str):
+        data = bytes.fromhex(data)
+        if len(data) != 5:
+            return
+        payload.update(
+            {
+                "action": "error",
+                "error": BLE_SPEC_LOCK_ERROR.get(data[4], data[4]),
+                "error_id": data[4],
+                "timestamp": datetime.fromtimestamp(
+                    int.from_bytes(data[0:4], "little")
+                ).isoformat(),
+            }
+        )
+
+
+class BLESpecDoorbell(BaseConv):
+    """Doorbell Ring (5.e.1006), arg 1: timestamp uint32."""
+
+    def decode(self, device: "XDevice", payload: dict, data: str):
+        data = bytes.fromhex(data)
+        if len(data) != 4:
+            return
+        payload.update(
+            {
+                "action": "doorbell",
+                "timestamp": datetime.fromtimestamp(
+                    int.from_bytes(data, "little")
+                ).isoformat(),
+            }
+        )
