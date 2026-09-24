@@ -1587,14 +1587,9 @@ DEVICES += [{
         BaseConv("temperature", mi="2.p.1001"),  # update param without entity
         BaseConv("smoke_duration", "sensor", mi="2.e.1017.p.1130", entity={"icon": "mdi:timer", "units": "s"}),
         BaseConv("smoke_duration", mi="2.p.1130"),  # update param without entity
-        MapConv("action", "sensor", mi="2.e.1017.p.8", map={
-            0: "smoke_alarm", 1: "smoke_high_temp_alarm", 2: "smoke_diff_temp_alarm",
-            3: "smoke_alarm_cleared", 4: "high_temp_alarm", 5: "fault",
-            6: "fault_cleared", 7: "dust_accumulation", 8: "dust_cleared",
-            9: "temp_refresh", 10: "normal_heartbeat", 11: "temp_normal", 12: "paired_normal",
-        }),
-        BaseConv("custom_property_3", "sensor", mi="8.p.1077", entity={"category": "diagnostic", "enabled": False}),  # diagnostic, disabled
-        BaseConv("custom_property_5", "sensor", mi="8.p.1094", entity={"category": "diagnostic", "enabled": False}),  # diagnostic, disabled
+        MapConv("action", "sensor", mi="2.e.1017.p.8", map={0: "smoke_alarm", 1: "smoke_high_temp_alarm", 2: "smoke_diff_temp_alarm", 3: "smoke_alarm_cleared", 4: "high_temp_alarm", 5: "fault", 6: "fault_cleared", 7: "dust_accumulation", 8: "dust_cleared", 9: "temp_refresh", 10: "normal_heartbeat", 11: "temp_normal", 12: "paired_normal"}),
+        # BaseConv("custom_property_3", "sensor", mi="8.p.1077", entity={"category": "diagnostic", "enabled": False}),  # diagnostic, disabled
+        # BaseConv("custom_property_5", "sensor", mi="8.p.1094", entity={"category": "diagnostic", "enabled": False}),  # diagnostic, disabled
         ConstConv("action", mi="2.e.1028", value="reset"),  # device-be-reset
         ConstConv("action", mi="6.e.1001", value="low_battery"),  # low-battery event
     ],
